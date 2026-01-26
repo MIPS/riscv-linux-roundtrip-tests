@@ -1,0 +1,24 @@
+# Test P8700 Linux boot via QEMU
+#
+# This test verifies that the P8700 configuration can successfully boot
+# Linux to a login prompt via QEMU emulation.
+#
+# REQUIRES: qemu
+# REQUIRES: p8700-assets
+
+# RUN: %scripts/boot-qemu.sh --cpu p8700 \
+# RUN:     --kernel %downloads/p8700/fw_payload.bin \
+# RUN:     --rootfs %downloads/p8700/rootfs.ext2 \
+# RUN:     --timeout 120 --quiet 2>&1 | FileCheck %s
+
+# Check for OpenSBI firmware initialization
+# CHECK: OpenSBI
+
+# Check for Linux kernel boot
+# CHECK: Linux version
+
+# Check for correct machine identification
+# CHECK: Machine model: MIPS P8700
+
+# Check for login prompt (boot complete)
+# CHECK: login:

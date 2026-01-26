@@ -1,0 +1,30 @@
+# Test P8700 boot pattern detection
+#
+# This test verifies specific boot messages appear during P8700 boot.
+# It uses a shorter timeout and checks for key initialization stages.
+#
+# REQUIRES: qemu
+# REQUIRES: p8700-assets
+
+# RUN: %scripts/boot-qemu.sh --cpu p8700 \
+# RUN:     --kernel %downloads/p8700/fw_payload.bin \
+# RUN:     --rootfs %downloads/p8700/rootfs.ext2 \
+# RUN:     --timeout 120 --quiet 2>&1 | FileCheck %s --check-prefix=BOOT
+
+# OpenSBI initialization
+# BOOT: OpenSBI
+
+# Linux kernel starts
+# BOOT: Linux version
+
+# Memory detection
+# BOOT: Memory:
+
+# Root filesystem mounted
+# BOOT: VFS: Mounted root
+
+# Init process starts
+# BOOT: Run /sbin/init
+
+# System reaches login
+# BOOT: login:

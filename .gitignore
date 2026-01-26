@@ -1,0 +1,8 @@
+downloads/
+results/
+*.o
+*.bin
+*.ext2
+__pycache__/
+tests/.lit_test_times.txt
+tests/p8700/Output/

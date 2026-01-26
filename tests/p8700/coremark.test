@@ -1,0 +1,34 @@
+# Test CoreMark benchmark on P8700 via QEMU
+#
+# This test runs the CoreMark benchmark on P8700 and verifies
+# that it completes successfully with valid results.
+#
+# REQUIRES: qemu
+# REQUIRES: p8700-assets
+# REQUIRES: debugfs
+# REQUIRES: toolchain
+
+# RUN: %scripts/run-coremark.sh --cpu p8700 \
+# RUN:     --rootfs %downloads/p8700/rootfs.ext2 \
+# RUN:     --kernel %downloads/p8700/fw_payload.bin \
+# RUN:     --timeout 300 --quiet 2>&1 | FileCheck %s
+
+# Check CoreMark starts
+# CHECK: === CoreMark Auto-Run ===
+# CHECK: Starting CoreMark benchmark
+
+# Check for CoreMark banner and configuration
+# CHECK: CoreMark
+
+# Check for valid iterations (should see some positive number)
+# CHECK: Iterations/Sec
+
+# Check for CRC validation (ensures correct execution)
+# CHECK: Correct operation validated
+
+# Check for completion marker
+# CHECK: COREMARK_TEST_DONE
+
+# Check final results summary
+# CHECK: === CoreMark Results ===
+# CHECK: Status: PASS
