@@ -4,28 +4,20 @@ import serial
 import subprocess
 import getpass
 import time
-import sys
+import toml
 
-result = 1
-uboot_path = sys.argv[2]
+config = toml.load("/tmp/coremark/serial-test-config.toml")
 
-while result != 0:
-    if result is None:
-        continue
-    result = subprocess.call(["boston", "flash", uboot_path])
+for i in ["U-Boot", "Bitfile"]:
+    result = 1
+    while result != 0:
+        result = subprocess.call((config[i]["flash_cmd"] + " " +
+                                  config[i]["path"]).split(" "))
+        
+    print(i + " flash succesful.")
 
-print("U-Boot flash succesful.")
-
-result = 1
-bitfile_path = sys.argv[3]
-
-while result != 0:
-    if result is None:
-        continue
-    result = subprocess.call(["boston", "bitfile", bitfile_path])
-
-port_name = "/dev/ttyUSB2"
-baud_rate = 115200
+port_name = config["Connection"]["port_name"]
+baud_rate = config["Connection"]["baud_rate"]
 ser = None
 
 try:
