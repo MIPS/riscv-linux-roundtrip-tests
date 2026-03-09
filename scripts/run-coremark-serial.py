@@ -6,6 +6,19 @@ import getpass
 import time
 import toml
 
+def debug_print(ln):
+    if debug:
+        print(ln)
+
+def error_print(ln):
+    print("ERROR: " + ln)
+
+def send_command(cmd):
+    ser.write((cmd.encode("utf-8") + b'\r\n'))
+    ser.flush()
+    time.sleep(0.01)
+
+debug = True # Use for additional info for debugging
 config = toml.load("/tmp/coremark/serial-test-config.toml")
 
 for i in ["U-Boot", "Bitfile"]:
@@ -14,7 +27,7 @@ for i in ["U-Boot", "Bitfile"]:
         result = subprocess.call((config[i]["flash_cmd"] + " " +
                                   config[i]["path"]).split(" "))
         
-    print(i + " flash succesful.")
+    debug_print(i + " flash succesful.")
 
 port_name = config["Connection"]["port_name"]
 baud_rate = config["Connection"]["baud_rate"]
@@ -23,32 +36,29 @@ ser = None
 try:
     ser = serial.Serial(port_name, baud_rate, timeout=1)
     time.sleep(5) # Wait for device to initialize
-    print("Connected to " + port_name)
+    debug_print("Connected to " + port_name)
 
     ser.flush()
     result = subprocess.call(["cpu_reset"])
 
     while True:
-        line = ser.readline().decode('utf-8').strip()
-        print("Received: " + line)
+        line = ser.readline().decode("utf-8").strip()
+        debug_print("Received: " + line)
         if "login:" in line:
-            data = input("Enter login:").encode("utf-8")
-            ser.write(data + b'\r\n')
-            ser.flush()
+            send_command(input("Enter login:"))
         elif "Password" in line:
-            data = getpass.getpass().encode("utf-8")
-            ser.write(data + b'\r\n')
-            ser.flush()
-            time.sleep(10)
+            send_command(getpass.getpass())
+            time.sleep(5) # Wait for Password check
             if ser.in_waiting:
                 break
-        time.sleep(0.01)
+
+    debug_print("Login successful.")
 
 except serial.SerialException as e:
-    print("Error opening serial port " + str(e))
+    error_print("Error opening serial port " + str(e))
 except KeyboardInterrupt:
-    print("Program terminated by user")
+    error_print("Program terminated by user")
 finally:
     if ser and ser.is_open:
         ser.close()
-        print("Serial port closed")
+        debug_print("Serial port closed")
