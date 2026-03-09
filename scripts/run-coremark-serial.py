@@ -31,6 +31,7 @@ for i in ["U-Boot", "Bitfile"]:
 
 port_name = config["Connection"]["port_name"]
 baud_rate = config["Connection"]["baud_rate"]
+coremark_path = config["Connection"]["coremark_path"]
 ser = None
 
 try:
@@ -54,6 +55,22 @@ try:
 
     debug_print("Login successful.")
 
+    # Mark command output with __BEGIN__ and __END__ markers
+    send_command("echo \"__BEGIN__\" && " + coremark_path + " && echo \"__END__\"")
+    coremark_output=""
+
+    # Skip output until we hit __BEGIN__
+    while ser.readline().decode("utf-8").strip() != "__BEGIN__":
+        pass
+
+    while True:
+        line = ser.readline().decode("utf-8").strip()
+        if line == "__END__":
+            break
+        elif line != "":
+            coremark_output += line + "\n"
+
+    print(coremark_output)
 except serial.SerialException as e:
     error_print("Error opening serial port " + str(e))
 except KeyboardInterrupt:
