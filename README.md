@@ -19,9 +19,9 @@ Tests are organized using [LLVM lit](https://llvm.org/docs/CommandGuide/lit.html
 ### P8700
 
 - [x] QEMU boot
-- [ ] FPGA boot
+- [x] FPGA boot
 - [x] CoreMark (QEMU)
-- [ ] CoreMark (FPGA)
+- [x] CoreMark (FPGA)
 - [ ] kselftest (QEMU)
 - [ ] kselftest (FPGA)
 - [ ] LTP (QEMU)
@@ -322,6 +322,51 @@ The lit-based test framework integrates easily with CI systems:
 
 - name: Run tests
   run: lit -v tests/
+```
+
+### run-coremark-remote.sh
+
+Run CoreMark remotely.
+
+```bash
+./run-coremark-remote.sh --dest <remote destination>
+
+Run CoreMark benchmark on the FPGA via SSH.
+
+The script setups the necessary boot artefacts, uses SSH in order to connect to
+the FPGA and runs the CoreMark benchmark.
+
+Options:
+    --dest <remote destination>    SSH destination (default: <username>@localhost:/tmp/coremark)
+    --kernel <path>                Path to fw_payload.bin (default: <current_path>/fw_payload.bin)
+    --uboot-bin <path>             Path to u-boot.bin (default: <current_path>/u-boot.bin)
+    --coremark-bin <path>          Path to CoreMark executable (default: <current_path>/coremark.exe)
+    --timeout <seconds>            Execution timeout (default: 300)
+    --output <path>                Output directory for results (default: <current_path>/results/)
+    --tftp-dir <path>              TFTP server directory (default: /tftpboot)
+    --quiet                        Suppress info messages (default: $QUIET)
+    --help                         Show this help
+```
+
+## Remote FPGA Configuration
+
+In `serial-test-config.toml`, you can change variables which control the serial connection to the FPGA and how flashing is handled:
+
+``` toml
+[Connection]
+port_name = "/dev/ttyUSB2"
+baud_rate = 115200
+coremark_path = "/root/coremark/coremark.exe"
+username = "root"
+password = "root"
+
+[U-Boot]
+flash_cmd = "boston flash"
+path = "/tmp/coremark/uboot-env.mcs"
+
+[Bitfile]
+flash_cmd = "boston bitfile"
+path = "/tmp/coremark/example.bit"
 ```
 
 ## License
