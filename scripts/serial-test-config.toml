@@ -1,0 +1,12 @@
+[Connection]
+port_name = "/dev/ttyUSB2"
+baud_rate = 115200
+coremark_path = "/root/coremark/coremark.exe"
+
+[U-Boot]
+flash_cmd = "boston flash"
+path = "/tmp/coremark/uboot-env.mcs"
+
+[Bitfile]
+flash_cmd = "boston bitfile"
+path = "/tmp/coremark/example.bit"
