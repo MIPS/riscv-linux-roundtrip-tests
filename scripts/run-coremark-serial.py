@@ -2,7 +2,6 @@
 
 import serial
 import subprocess
-import getpass
 import time
 import toml
 
@@ -46,9 +45,9 @@ try:
         line = ser.readline().decode("utf-8").strip()
         debug_print("Received: " + line)
         if "login:" in line:
-            send_command(input("Enter login:"))
+            send_command(config["Connection"]["username"])
         elif "Password" in line:
-            send_command(getpass.getpass())
+            send_command(config["Connection"]["password"])
             time.sleep(5) # Wait for Password check
             if ser.in_waiting:
                 break
